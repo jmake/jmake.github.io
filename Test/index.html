@@ -1,0 +1,724 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+    <meta name="generator" content="Hugo 0.101.0">
+    <title>Dashboard Template · Bootstrap v5.2</title>
+
+
+<!--| React |-->
+    <script src="https://unpkg.com/react@18.2.0/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <script src='https://unpkg.com/react-router-dom@5.0.0/umd/react-router-dom.min.js'></script>
+
+    <!--script src="https://unpkg.com/react-router@6.4.0/dist/umd/react-router.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-router-dom@6.4.0/dist/umd/react-router-dom.development.js" crossorigin></script-->
+
+<!--| Axios |-->
+    <!--script src="https://unpkg.com/axios/dist/axios.min.js"></script-->
+    <script src="https://unpkg.com/axios@1.0.0/dist/axios.min.js"></script>
+
+<!--| Bootstrap |-->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" 
+     integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.min.js" 
+     integrity="sha384-ODmDIVzN+pFdexxHEHFBQH3/9/vQ9uori45z4JjnFsRydbmQbmL5t1tQ0culUzyK" crossorigin="anonymous"></script>
+
+<!--| jquery |-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+
+<!--|  |-->
+    <!--link href="dashboard.css" rel="stylesheet"-->
+
+    <style>
+
+      .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        user-select: none;
+      }
+
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+
+      .b-example-divider {
+        height: 3rem;
+        background-color: rgba(0, 0, 0, .1);
+        border: solid rgba(0, 0, 0, .15);
+        border-width: 1px 0;
+        box-shadow: inset 0 .5em 1.5em rgba(0, 0, 0, .1), inset 0 .125em .5em rgba(0, 0, 0, .15);
+      }
+
+      .b-example-vr {
+        flex-shrink: 0;
+        width: 1.5rem;
+        height: 100vh;
+      }
+
+      .bi {
+        vertical-align: -.125em;
+        fill: currentColor;
+      }
+
+      .nav-scroller {
+        position: relative;
+        z-index: 2;
+        height: 2.75rem;
+        overflow-y: hidden;
+      }
+
+      .nav-scroller .nav {
+        display: flex;
+        flex-wrap: nowrap;
+        padding-bottom: 1rem;
+        margin-top: -1px;
+        overflow-x: auto;
+        text-align: center;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      #XXX{color:white; padding:10px; text-align:center; background-color:black;}
+      #BOTTOMCOLOR {background-color: salmon; color: white;}
+
+    </style>
+<!--|  |-->
+    
+  </head> <!--| HEAD |--> 
+
+  <body> <!--| BODY |-->
+    
+<!--| TOP |-->
+<div class="container-fluid">
+  <div class="row">
+ 
+    <!--| SideBar |--> 
+    <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse bg-dark">
+
+      <div class="position-sticky pt-3 sidebar-sticky" id="XXX">
+
+        <ul class="nav flex-column">
+
+          <div id="Home"></div>
+
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="#" id="ShowSearch">
+              <span data-feather="home" class="align-text-bottom"></span>
+              Search
+            </a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="#" id="ShowSongs">
+              <span data-feather="home" class="align-text-bottom"></span>
+              Songs
+            </a>
+          </li>
+
+        </ul>
+
+      </div>
+    </nav>
+    <!--| SideBar |--> 
+
+
+    <!--| main |-->
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+
+    <div id="Search"></div>
+    <div id="Songs"></div>
+    <div id="Main"></div>
+ 
+    <canvas class="my-4 w-100" id="myChart" width="1800" height="380"></canvas>
+
+    </main>
+    <!--| main |-->
+
+  </div>
+</div>
+<!--| TOP |-->
+
+<!--| BOTTOM |-->
+<nav class="navbar fixed-bottom navbar-expand-sm navbar-dark bg-dark">
+  <div class="container-fluid">
+
+  <div class="col-sm-2" id="XXX">  </div>
+  <div class="col"      id="XXX">
+    <div id="IDaudio"></div>
+  </div>
+
+  </div>
+</nav>
+<!--| BOTTOM |-->
+
+<!-----------------------------------------------------------| SCRIPTS |-->
+<!--| BABEL |-->
+
+
+<!--| |-->
+<script type="text/babel">
+
+const GetUnique = (a) => [...new Set(a)]; 
+
+function GetKeysAll(listOfMaps)
+{ 
+  let extracted = listOfMaps.flatMap(e => Object.keys(e));
+  let unique = [...new Set(extracted)];
+  console.log(unique);
+  return unique;     
+}
+
+
+function GetValuesByKeys(listOfMaps, keys)
+{
+  let extracted = listOfMaps.flatMap(object => keys.map(element => object[element]));
+  extracted = GetUnique(extracted);
+  return extracted;
+}
+
+
+function GetValuesUnique(data, key)
+{ 
+  let unique = [...new Set(data.map(item => item[key]))];
+  return unique
+}
+
+
+function GetValuesAll(listOfMaps)
+{ 
+  let keys = listOfMaps.flatMap(e => Object.keys(e));
+  keys = [...new Set(keys)];
+  
+  let values = listOfMaps.flatMap(object => keys.map(element => object[element]));
+  values = [...new Set(values)];
+  console.log(values);
+}
+
+
+function FilteringByValue(listOfMaps, column, value)
+{
+  return listOfMaps.filter(i=>i[column].includes(value)); 
+}
+
+
+function GetExtracted(listOfMaps,column)
+{ 
+  let extracted = null;
+  extracted = GetValuesUnique(listOfMaps,column); 
+  extracted = extracted.map(v => FilteringByValue(listOfMaps,column,v)); 
+  return extracted.map(a => {return {...a}}); 
+}
+
+</script>
+<!--| |-->
+
+
+
+<!--| |-->
+<script type="text/babel">
+
+const PrintJson = ({data}) => (<div><pre>{JSON.stringify(data,null,2)}</pre></div>);
+
+const URL_DB = "https://github.com/paakat/Assets/blob/main/";
+
+const URL_SERVER = "http://localhost:8080/music/"; 
+//const URL_SERVER = "https://github.com/paakat/Assets/blob/main/something.json?raw=true"; 
+
+
+const SongPrint = ({song}) => {
+
+  return (
+    <li> 
+      <h2> {song.title} </h2> 
+
+      <img 
+        src={URL_DB + song.pathToAlbum +"?raw=true"} 
+        alt="alternatetext" >
+      </img>
+
+      <audio controls 
+        src={URL_DB + song.pathToMusic +"?raw=true"} >
+      </audio>
+
+    </li> 
+  );
+};
+
+</script>
+
+
+<!--| data |-->
+<script type="text/babel">
+
+var data = {items: [
+{ itemClass: 'Item', id: 1, contentsHTML: '', text: 'Item 1'},
+{ itemClass: 'Item', id: 2, contentsHTML: '', text: 'Item 2'},
+{ itemClass: 'Item', id: 3, contentsHTML: '', text: 'Item 3'},
+{ itemClass: 'Item', id: 4, contentsHTML: '', text: 'Item 4'},
+{ itemClass: 'Item', id: 5, contentsHTML: '', text: 'Item 5'}
+]};
+
+
+var DUMMY_DATA = [{"id":1,"title":"Andy you are a star","artist":"The Killers","album":"Hot fuss","genre":"rock","pathToMusic":"/music/andy-you-are-a-star.mp3","pathToAlbum":"/images/hot-fuss.png"},{"id":2,"title":"Change your mind","artist":"The Killers","album":"Hot fuss","genre":"rock","pathToMusic":"/music/change-your-mind.mp3","pathToAlbum":"/images/hot-fuss.png"},{"id":3,"title":"Despacito","artist":"Luis Fonsi","album":"Vida","genre":"reggaeton","pathToMusic":"/music/despacito.mp3","pathToAlbum":"/images/vida.png"},{"id":4,"title":"El muro","artist":"Daddy Yankee","album":"Barrio fino","genre":"reggaeton","pathToMusic":"/music/el-muro.mp3"},{"id":5,"title":"Forbidden love","artist":"Madonna","album":"Confessions on the dance floor","genre":"pop","pathToMusic":"/music/forbidden-love.mp3","pathToAlbum":"/images/confessions-on-the-dance-floor.png"},{"id":6,"title":"Frozen","artist":"Madonna","album":"Ray of light","genre":"pop","pathToMusic":"/music/frozen.mp3","pathToAlbum":"/images/ray-of-light.png"},{"id":7,"title":"Gasolina","artist":"Daddy Yankee","album":"Barrio fino","genre":"reggaeton","pathToMusic":"/music/gasolina.mp3"},{"id":8,"title":"I love New York","artist":"Madonna","album":"Confessions on the dance floor","genre":"pop","pathToMusic":"/music/i-love-new-york.mp3","pathToAlbum":"/images/confessions-on-the-dance-floor.png"},{"id":9,"title":"Jump","artist":"Madonna","album":"Ray of light","genre":"pop","pathToMusic":"/music/jump.mp3","pathToAlbum":"/images/confessions-on-the-dance-floor.png"},{"id":10,"title":"Little star","artist":"Madonna","album":"Ray of light","genre":"pop","pathToMusic":"/music/little-star.mp3","pathToAlbum":"/images/ray-of-light.png"},{"id":11,"title":"Lo que pasó pasó","artist":"Daddy Yankee","album":"Barrio fino","genre":"reggaeton","pathToMusic":"/music/lo-que-paso-paso.mp3"},{"id":12,"title":"Night train","artist":"Guns and Roses","album":"Appetite for destruction","genre":"rock","pathToMusic":"/music/night-train.mp3","pathToAlbum":"/images/appetite-for-destruction.png"},{"id":13,"title":"Paradise city","artist":"Guns and Roses","album":"Appetite for destruction","genre":"rock","pathToMusic":"/music/paradise-city.mp3","pathToAlbum":"/images/appetite-for-destruction.png"},{"id":14,"title":"Since i don't have you","artist":"Guns and Roses","album":"The spaghetti incident","genre":"rock","pathToAlbum":"/images/vida.png"},{"id":15,"title":"Sola","artist":"Luis Fonsi","album":"Vida","genre":"reggaeton","pathToAlbum":"/images/vida.png"},{"id":16,"title":"This love","artist":"Taylor Swift","album":"1989","genre":"pop","pathToMusic":"/music/this-love.mp3","pathToAlbum":"/images/1989.png"},{"id":17,"title":"Welcome to New York","artist":"Taylor Swift","album":"1989","genre":"pop","pathToMusic":"/music/welcome-to-new-york.mp3","pathToAlbum":"/images/1989.png"},{"id":18,"title":"Welcome to the family","artist":"Avenged Sevenfold","album":"Nightmare","genre":"metal","pathToMusic":"/music/welcome-to-the-family.mp3","pathToAlbum":"/images/nightmare.png"},{"id":19,"title":"Welcome to the jungle","artist":"Guns and Roses","album":"Appetite for destruction","genre":"rock","pathToMusic":"/music/welcome-to-the-jungle.mp3","pathToAlbum":"/images/appetite-for-destruction.png"},{"id":20,"title":"When we where young","artist":"The Killers","album":"Sam's town","genre":"rock","pathToMusic":"/music/when-we-were-young.mp3"}]; 
+
+</script>
+
+
+<!--| |-->
+<script type="text/babel">
+
+var Renderer=(_id,_input)=>ReactDOM.createRoot(document.getElementById(_id)).render(<React.StrictMode>{_input}</React.StrictMode>);
+
+</script>
+
+
+<!--| Button1 |-->
+<script type="text/babel">
+
+function Button1() {
+  const [isActive, setIsActive] = React.useState(false);
+
+  const handleClick = event => {
+    setIsActive(current => !current);
+  };
+
+  return (
+    <div>
+      <button type="button" className="btn btn-sm btn-outline-secondary"
+              id={isActive?'BOTTOMCOLOR':''} onClick={handleClick} id="ShowSongs"> 
+        Click me 
+      </button>
+    </div>
+  );
+}
+
+</script>
+<!--| Button1 |-->
+
+
+<!--| |-->
+<script type="text/babel">
+
+function Home2() 
+{
+  const refreshPage = () => window.location.reload(false);
+
+  return (
+    <li className="nav-item">
+      <a className="nav-link active" aria-current="page" href="#" id="ShowMain" onClick={refreshPage}>
+        Home
+      </a>
+    </li>
+  );
+}
+
+Renderer("Home", <Home2/>);
+</script>
+<!--| |-->
+
+
+
+<!--| Sections |-->
+<script type="text/babel">
+
+// X. Card 
+class Card extends React.Component 
+{
+  render(){return(
+    <div className="col">
+      <div className="card shadow-sm"> 
+
+{
+  (this.props['image']=='') ? 
+  (
+        <svg className="bd-placeholder-img card-img-top" width="100%" height="225" 
+         xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail" 
+         preserveAspectRatio="xMidYMid slice" focusable="false"
+        >
+          <rect width="100%" height="100%" fill="#55595c"/>
+          <text x="50%" y="50%" fill="#eceeef" dy=".3em">
+            {this.props['id']}  
+          </text>
+        </svg>
+  ) : ( 
+      <img src={URL_DB + this.props['image'] +"?raw=true"} > 
+      </img>
+  )  
+}
+
+        <div className="card-body">
+
+          <div className="d-flex justify-content-between align-items-center">
+            <div className="btn-group">
+              {this.props.func(this.props['id'], this.props['songs']) }
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  )}
+} 
+
+
+class Body extends React.Component 
+{
+  state = {data: [], keys:[]}  
+
+  componentDidMount() 
+  {
+    axios.get(URL_SERVER).then(response => {
+      console.log("[Body]:'" + this.props.prop1 +"' ");
+
+      var data = DUMMY_DATA; //response.data; 
+      var extracted = GetExtracted(data,this.props.prop1);
+      var keys = GetValuesUnique(data,this.props.prop1); 
+      this.setState({data:extracted,keys:keys});
+    })
+  } 
+
+  GetCards = () => {
+    var keys = this.state.keys;
+    var songs = this.state.data;  
+
+    var list = []; 
+
+    for(let i = 0; i < this.state.keys.length; i++) 
+    {
+      var image = GetValuesUnique(Object.values(songs[i]),"pathToAlbum"); 
+      image = image.filter(element => {return element !== undefined;});
+      image = (image.length > 0)?(image[0]):(''); 
+
+      list.push( <Card key={i} id={keys[i]} func={this.props.prop2} songs={songs[i]} image={image}/> ); 
+    }
+
+    return list; 
+  }
+
+
+  render(){return(
+  <div>
+    <h1> {this.props.prop1} </h1>
+
+    <div className="album py-5 bg-light">
+      <div className="container">
+        <div className="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4"> 
+
+          <this.GetCards/>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+  )} 
+}
+</script>
+<!--| Sections |-->
+
+
+<!--| Main4 |-->
+<script type="text/babel">
+
+const Main4 = () => {
+
+  const [selected, setSelected] = React.useState({});
+  const [message, setMessage] = React.useState("empty");
+  const [ isShow, setShow   ] = React.useState(true);
+
+
+  function handleBottom(key, songs) 
+  {
+    return( 
+      <div>
+        <button onClick={handleClick} type="button" value={key} selected={songs} > {key} </button>
+      </div>
+    );
+  }
+
+  function handleClick(input) 
+  {
+    setShow(!isShow);
+
+    setMessage(event.target["value"]);
+    setSelected(event.target["selected"]);
+    console.log("[Main4] '" + event.target["value"] +"' "); 
+  }
+
+  return (
+    <div>
+      {isShow ? <Body prop1="artist" prop2={handleBottom} /> : null}
+      {isShow ? <Body prop1="album"  prop2={handleBottom} /> : null}
+      {isShow ? <Body prop1="genre"  prop2={handleBottom} /> : <Songs3 message={message} selected={selected} />}
+    </div>
+  );
+};
+
+Renderer("Main", <Main4/>);
+</script>
+<!--| Main4 |-->
+
+
+<!--| Songs3 |-->
+<script type="text/babel">
+
+class Songs3 extends React.Component
+{
+  state = {execute:false, songs:[]}  
+
+  componentDidMount() 
+  {
+    var execute = "message" in this.props;
+    console.log("[Songs] execute:" + execute); 
+
+    if(execute) 
+    {
+      var list1 = Object.values( this.props["selected"] ); 
+      this.setState({execute:true,songs:list1});
+    }
+    else
+    {
+      axios.get(URL_SERVER).then(response => 
+      {
+        var data = DUMMY_DATA; //response.data; 
+        var list1 = Object.values(data); 
+        this.setState({execute:false,songs:list1});
+      })
+    } 
+  }
+
+  Display(songs) 
+  {
+    //songs.forEach(e => console.log(e["title"]) ); 
+    return songs.map(s => <SongPrint song={s} key={s.id}/>); 
+  }
+
+  render(){return(
+    <div>
+
+      <h1>
+        {this.state["execute"] ? this.props["message"] : "All Songs"}
+      </h1> 
+
+      { this.Display(this.state["songs"]) }
+
+    </div>
+  )}
+}
+
+Renderer("Songs", <Songs3/>);
+</script>
+<!--| Songs3 |-->
+
+
+<!--| Button2 |-->
+<script type="text/babel">
+
+function Button2({message,Display}) {
+  const [isActive, setIsActive] = React.useState(false);
+  const handleClick = () => setIsActive(!isActive);
+
+  return (
+    <div>
+      <button type="button" className="btn btn-sm btn-outline-secondary" onClick={handleClick}>
+        Looking for '{message}'
+      </button>
+      {isActive && Display}
+    </div>
+  );
+}
+
+</script>
+<!--| Button2 |-->
+
+
+<!--| Search1 |-->
+<script type="text/babel">
+
+
+const Search1 = () => 
+{
+  const [ count, setCount ] = React.useState(0);
+  React.useEffect(() => { if(count) console.log("[Search1] count:"+count); }, [count]);
+
+  const [employee, setEmployee] = React.useState(Object);
+
+  const [greeting, setGreeting] = React.useState('york');
+  const [isActive, setIsActive] = React.useState(true);
+
+  const extracting = (list,column,request) => list.filter(i => i[column].toLowerCase().includes(request));
+
+
+  function handleChange(event)
+  {
+    setGreeting(event.target["value"]);
+/*
+    axios.get(URL_SERVER).then(response => 
+    {
+      var data = DUMMY_DATA; //response.data; 
+      setEmployee( data ); 
+    }); 
+*/
+  } 
+
+/*
+  function handleClick(input) 
+  {
+    setCount(count + 1);
+
+    axios.get(URL_SERVER).then(response => 
+    {
+      var data = DUMMY_DATA; //response.data; 
+      setEmployee( data ); 
+    }); 
+
+    console.log("[handleClick] '" + event.target["value"] +"' "); 
+  }
+*/
+
+
+  function Executing() 
+  {
+    axios.get(URL_SERVER).then(response => 
+    {
+      var data = DUMMY_DATA; //response.data; 
+      setEmployee( data ); 
+    });
+
+    //return Displaying(); 
+  }
+
+
+  function Displaying({column}) 
+  {
+    var request = ("value" in event.target)?(event.target["value"]):(greeting);
+
+    console.log("[Looking for] '" + request +"' ... "); 
+
+    request = request.toLowerCase();
+    let extracted = extracting(Object.values(employee),column,request); 
+    console.log( extracted ); 
+
+    return extracted.map(s => <SongPrint song={s} key={s.id}/>);
+  }
+
+
+  const Message = ({text}) => {return <h1>{text}</h1>;};
+
+  return(
+    <div>
+      <Message text={"Search song:"} /> 
+      <input type="text" value={greeting} onChange={handleChange} />
+
+      <h3>
+        Looking for '{greeting}'.  
+      </h3>
+
+      <Executing/>
+
+      <h2> Found in Titles : </h2>
+      <Displaying column={"title"}/>
+
+      <h2> Found in Albums : </h2>
+      <Displaying column={"album"}/>
+
+      <h2> Found in Artist : </h2>
+      <Displaying column={"artist"}/>
+
+    </div>
+  )
+}
+
+Renderer("Search", <Search1/>);
+</script>
+<!--| Search |-->
+
+
+<!--| JQUERY |-->
+<script>
+var Main = $('Main').html(); 
+
+//$("#Main").hide();
+$("#Songs").hide();
+$("#Search").hide();
+
+$(document).ready(function(){
+  $("#ShowSearch").click(function(){$("#Search").show();$("#Main").hide();$("#Songs").hide();});
+  $("#ShowSongs").click(function(){$("#Songs").show();$("#Search").hide();$("#Main").hide();});
+  $("#ShowMain").click(function(){$("#Main").show();$("#Search").hide();$("#Songs").hide();});
+});
+</script>
+<!--| JQUERY |-->
+
+
+<!--| Audio |-->
+<script type="text/babel">
+
+  function IDCOL04a() {return (
+  <div className="container">
+    <audio controls src="https://github.com/paakat/Assets/blob/main/music/despacito.mp3?raw=true"> 
+    </audio>
+  </div>
+  )} 
+  //ReactDOM.createRoot(document.getElementById("IDaudio")).render(<React.StrictMode> <IDCOL04a/> </React.StrictMode>);
+</script>
+<!--| Audio |-->
+
+
+
+<!-- firebase  
+<script type="module">
+
+  // Import the functions you need from the SDKs you need
+
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-app.js";
+
+  // TODO: Add SDKs for Firebase products that you want to use
+
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+
+  // Your web app's Firebase configuration
+
+  const firebaseConfig = {
+
+    apiKey: "AIzaSyD4w2i-42bv0fWjzGZM4qRtRrX6I5cnG9A",
+
+    authDomain: "musicplayerweb-b4972.firebaseapp.com",
+
+    projectId: "musicplayerweb-b4972",
+
+    storageBucket: "musicplayerweb-b4972.appspot.com",
+
+    messagingSenderId: "502254604113",
+
+    appId: "1:502254604113:web:93d39016d7dfc25855cd70"
+
+  };
+
+
+  // Initialize Firebase
+
+  const app = initializeApp(firebaseConfig);
+
+</script>
+
+--> 
+
+
+<!--| Babel Scripts |-->
+
+  </body>
+</html>
